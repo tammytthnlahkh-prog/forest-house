@@ -13,13 +13,35 @@ jobs:
 
       - name: Unzip Project Files
         run: |
-          unzip BaytAlGhaba_mobile.zip
-          rm BaytAlGhaba_mobile.zip
+          unzip BaytAlGhaba_mobile.zip || true
+          unzip */BaytAlGhaba_mobile.zip || true
+          find . -name "project.godot"
 
-      - name: Move Export Presets
+      - name: Force Create Export Presets
         run: |
-          mkdir -p ~/.local/share/godot/export_templates
-          cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/ || true
+          cat <<EOF > export_presets.cfg
+          [preset.0]
+          name="Android"
+          platform="Android"
+          runnable=true
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_files"
+          include_filter=""
+          exclude_filter=""
+          export_path="build/android/mygame.apk"
+          encryption/encrypt_pck=false
+          encryption/encrypt_directory=false
+          
+          [preset.0.options]
+          architectures/armeabi-v7a=true
+          architectures/arm64-v8a=true
+          architectures/x86=false
+          architectures/x86_64=false
+          package/unique_name="com.forest.house"
+          package/name="Forest House"
+          package/signed=false
+          EOF
 
       - name: Build APK
         run: |
