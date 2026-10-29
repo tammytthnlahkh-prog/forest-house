@@ -5,47 +5,26 @@ jobs:
   export_android:
     name: Build Android APK
     runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3-stable
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android Licenses
-        run: |
-          yes | sdkmanager --licenses || true
 
       - name: Unzip Project Files
         run: |
           unzip BaytAlGhaba_mobile.zip
           rm BaytAlGhaba_mobile.zip
 
-      - name: Download Godot
+      - name: Move Export Presets
         run: |
-          wget https://github.com
-          unzip Godot_v4.3-stable_linux.x86_64.zip
-          mv Godot_v4.3-stable_linux.x86_64 godot
-          chmod +x godot
-
-      - name: Download Export Templates
-        run: |
-          wget https://github.com
-          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
-          unzip Godot_v4.3-stable_export_templates.tpz -d templates_extract
-          mv templates_extract/templates/* ~/.local/share/godot/export_templates/4.3.stable/
-          rm -rf templates_extract Godot_v4.3-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates
+          cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/ || true
 
       - name: Build APK
         run: |
           mkdir -p build/android
-          ./godot --headless --export-release "Android" build/android/mygame.apk
+          godot --headless --export-release "Android" build/android/mygame.apk
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
