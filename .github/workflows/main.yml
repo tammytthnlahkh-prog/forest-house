@@ -18,6 +18,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Accept Android Licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
       - name: Unzip Project Files
         run: |
           unzip BaytAlGhaba_mobile.zip
