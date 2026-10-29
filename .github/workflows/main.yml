@@ -1,0 +1,32 @@
+name: "تصدير لعبة قودوت 4 للهاتف"
+on: [push, pull_request]
+
+jobs:
+  export_android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.7.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unzip Project Files
+        run: |
+          unzip BaytAlGhaba_mobile.zip
+          rm BaytAlGhaba_mobile.zip
+
+      - name: Move Export Presets
+        run: mkdir -p ~/.local/share/godot/export_templates && cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/
+
+      - name: Build APK
+        run: |
+          mkdir -p build/android
+          godot --headless --export-release "Android" build/android/mygame.apk
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-android-game
+          path: build/android/mygame.apk
+          
