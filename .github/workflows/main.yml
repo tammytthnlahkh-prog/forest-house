@@ -58,9 +58,17 @@ jobs:
           mv Android_Debug.apk android_debug.apk || true
           mv Android_Release.apk android_release.apk || true
           mv android_release.apk android_release_signed.apk || true
+          cd -
+
+          # حقن مسارات Java SDK و Android SDK إجبارياً لحل مشكلة المحرك
+          mkdir -p ~/.config/godot
+          cat <<EOF > ~/.config/godot/editor_settings-4.tres
+          [id="export/android"]
+          android_sdk_path="/usr/lib/android-sdk"
+          java_sdk_path="/usr/lib/jvm/java-17-openjdk-amd64"
+          EOF
           
           # العودة وبناء اللعبة
-          cd -
           mkdir -p ../../build
           godot --headless --export-release "Android" ../../build/mygame.apk
 
