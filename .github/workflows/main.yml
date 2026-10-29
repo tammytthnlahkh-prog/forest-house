@@ -1,15 +1,29 @@
-name: "تصدير لعبة قودوت 4 للويب"
+name: "تصدير لعبة قودوت للويب مضمون"
 on: [push, pull_request]
 
 jobs:
   export_web:
     name: Build Web HTML5
     runs-on: ubuntu-latest
-    container:
-      image: barichello/godot-ci:4.3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download Godot and Templates
+        run: |
+          sudo apt-get update && sudo apt-get install -y wget unzip
+          # تحميل المحرك
+          wget -q https://github.com
+          unzip Godot_v4.3-stable_linux.x86_64.zip
+          mv Godot_v4.3-stable_linux.x86_64 godot
+          chmod +x godot
+          
+          # تحميل وفك القوالب الرسمية في المسار الصحيح تماماً
+          wget -q https://github.com
+          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
+          unzip Godot_v4.3-stable_export_templates.tpz -d templates_extract
+          mv templates_extract/templates/* ~/.local/share/godot/export_templates/4.3.stable/
+          rm -rf templates_extract Godot_v4.3-stable_export_templates.tpz Godot_v4.3-stable_linux.x86_64.zip
 
       - name: Extract Project Smartly
         run: |
@@ -19,7 +33,7 @@ jobs:
           GODOT_DIR=$(find . -name "project.godot" -exec dirname {} \;)
           cd "$GODOT_DIR"
           
-          # إنشاء إعدادات تصدير الويب تلقائياً
+          # إنشاء إعدادات تصدير الويب النظيفة
           cat <<EOF > export_presets.cfg
           [preset.0]
           name="Web"
@@ -33,9 +47,9 @@ jobs:
           export_path="index.html"
           EOF
           
-          # بناء اللعبة بصيغة الويب
+          # بناء اللعبة باستخدام المحرك والقوالب المجهزة يدويًا
           mkdir -p ../../build
-          godot --headless --export-release "Web" ../../build/index.html
+          ../../godot --headless --export-release "Web" ../../build/index.html
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
