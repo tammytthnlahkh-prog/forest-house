@@ -12,13 +12,13 @@ jobs:
       - name: Download Godot and Templates
         run: |
           sudo apt-get update && sudo apt-get install -y wget unzip
-          # تحميل المحرك
+          # تحميل المحرك الرسمي
           wget -q https://github.com
           unzip Godot_v4.3-stable_linux.x86_64.zip
           mv Godot_v4.3-stable_linux.x86_64 godot
           chmod +x godot
           
-          # تحميل وفك القوالب الرسمية في المسار الصحيح تماماً
+          # تحميل وفك القوالب الرسمية
           wget -q https://github.com
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
           unzip Godot_v4.3-stable_export_templates.tpz -d templates_extract
@@ -47,7 +47,7 @@ jobs:
           export_path="index.html"
           EOF
           
-          # بناء اللعبة باستخدام المحرك والقوالب المجهزة يدويًا
+          # بناء اللعبة
           mkdir -p ../../build
           ../../godot --headless --export-release "Web" ../../build/index.html
 
