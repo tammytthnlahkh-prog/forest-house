@@ -11,14 +11,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Unzip Project Files
+      - name: Extract Project Smartly
         run: |
-          unzip BaytAlGhaba_mobile.zip || true
-          unzip */BaytAlGhaba_mobile.zip || true
-          find . -name "project.godot"
-
-      - name: Force Create Export Presets
-        run: |
+          mkdir -p game_files
+          unzip -q *.zip -d game_files || true
+          cd game_files
+          GODOT_DIR=$(find . -name "project.godot" -exec dirname {} \;)
+          echo "Project found in: $GODOT_DIR"
+          cd "$GODOT_DIR"
+          
+          # إنشاء ملف الإعدادات إجبارياً في المسار الصحيح
           cat <<EOF > export_presets.cfg
           [preset.0]
           name="Android"
@@ -29,7 +31,7 @@ jobs:
           export_filter="all_files"
           include_filter=""
           exclude_filter=""
-          export_path="build/android/mygame.apk"
+          export_path="mygame.apk"
           encryption/encrypt_pck=false
           encryption/encrypt_directory=false
           
@@ -42,15 +44,20 @@ jobs:
           package/name="Forest House"
           package/signed=false
           EOF
-
-      - name: Build APK
-        run: |
-          mkdir -p build/android
-          godot --headless --export-release "Android" build/android/mygame.apk
+          
+          # إجبار وضع قوالب التصدير في كل المسارات المتوقعة للحاوية
+          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
+          mkdir -p ~/.local/share/godot/templates/4.3.stable
+          cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/4.3.stable/ || true
+          cp -r /root/.local/share/godot/export_templates/* ~/.local/share/godot/templates/4.3.stable/ || true
+          
+          # بناء اللعبة
+          mkdir -p ../../build
+          godot --headless --export-release "Android" ../../build/mygame.apk
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-android-game
-          path: build/android/mygame.apk
+          path: build/mygame.apk
           
